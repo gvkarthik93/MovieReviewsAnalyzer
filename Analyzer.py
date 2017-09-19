@@ -3,6 +3,9 @@
 unigramDataFile = open("/Users/karthik/Desktop/NLP/MovieReviewsAnalyzer/SentimentDataset/Train/pos.txt")
 bigramDataFile = open("/Users/karthik/Desktop/NLP/MovieReviewsAnalyzer/SentimentDataset/Train/pos.txt")
 trigramDataFile = open("/Users/karthik/Desktop/NLP/MovieReviewsAnalyzer/SentimentDataset/Train/pos.txt")
+perplexityDataFile = open("/Users/karthik/Desktop/NLP/MovieReviewsAnalyzer/SentimentDataset/Train/pos.txt")
+
+bigramTestPositiveDataFile = open("/Users/karthik/Desktop/NLP/MovieReviewsAnalyzer/SentimentDataset/Test/test.txt")
 
 unigramCountDictionary = dict()
 bigramCountDictionary = dict()
@@ -76,11 +79,38 @@ def trigramProbability():
 		finalProbability = firstProbability * secondProbability
 		trigramProbabilityMap[key] = finalProbability
 
+#Calculate perplexity and deal with unkown words
+def calculatePerplexity():
+	perplexityString =""
+	for line in perplexityDataFile:
+		line = "<s> " + line + " </s>"
+		perplexityString = perplexityString + line
+	
+
+# Method to generate bigrams count - Test Data
+# If unknown word in test data occurs in bigrams then the unknown key is incremented by 1
+def generateTestDataBigrams():
+	for line in bigramTestPositiveDataFile:
+		bigramsList = []
+		review = "<s> " + line + " </s>"
+		bigramsList = bigramsList + review.split()
+		for i in range(0,len(bigramsList)-1):
+			word  = bigramsList[i] + " " + bigramsList[i+1]
+			if word in bigramCountDictionary:
+					bigramCountDictionary[word] += 1
+			else:
+				if "<unknown>" in bigramCountDictionary:
+					bigramCountDictionary["<unknown>"] += 1
+				else:
+					bigramCountDictionary["<unknown>"] = 1
+
+
 generateUnigrams()
 generateBigrams()
 generateTrigrams()
 unigramProbability()
 bigramProbability()
 trigramProbability()
+generateTestDataBigrams()
 
-print (trigramProbabilityMap)
+print (bigramCountDictionary["<unknown>"])
